@@ -1,3 +1,5 @@
+import { getMaxListeners } from 'cluster';
+
 describe('GraphQL Live Server:', () => {
 	let createdUserID;
 	let createdDestinationID;
@@ -9,6 +11,10 @@ describe('GraphQL Live Server:', () => {
 	let createdCommentID;
 	let createdCommentID2;
 	let createdCommentID3;
+
+	// Cookies:
+	let accessToken;
+	let refreshToken;
 
 	it('creates a user', () => {
 		const addUserQuery = `mutation {
@@ -43,6 +49,28 @@ describe('GraphQL Live Server:', () => {
 		});
 	});
 
+	// Log User In and Get Cookies - Set to Vars
+	it('logs in user & receives JWT', () => {
+		cy.request({
+			url: 'login',
+			method: 'POST',
+			body: {
+				email: 'test@gmail.com',
+				password: 'test',
+			},
+		}).then(res => {
+			cy.log(res);
+			cy.getCookie('refresh-token').then(cookie => {
+				refreshToken = cookie;
+				cy.log(refreshToken);
+			});
+			cy.getCookie('access-token').then(cookie => {
+				accessToken = cookie;
+				cy.log(accessToken);
+			});
+		});
+	});
+
 	it('updates a user', () => {
 		const updateUserQuery = `mutation {
 			updateUser(id: "${createdUserID}", name: "Bill", email: "bill@gmail.com", password: "test1234") {
@@ -51,24 +79,29 @@ describe('GraphQL Live Server:', () => {
 				password
 			}
 		}`;
-
-		cy.request({
-			url: 'graphql',
-			method: 'POST',
-			body: { query: updateUserQuery },
-			failOnStatusCode: false, // not a must but in case the fail code is not 200 / 400
-		}).then(res => {
-			cy.log(res);
-			const user = res.body.data.updateUser;
-			cy.wrap(user)
-				.should('have.property', 'name')
-				.and('eq', 'Bill');
-			cy.wrap(user)
-				.should('have.property', 'email')
-				.and('eq', 'bill@gmail.com');
-			cy.wrap(user)
-				.should('have.property', 'password')
-				.and('not.eq', 'test1234');
+		// Not working with access token
+		cy.setCookie(refreshToken.name, refreshToken.value).then(() => {
+			cy.request({
+				url: 'graphql',
+				method: 'POST',
+				body: { query: updateUserQuery },
+				failOnStatusCode: false, // not a must but in case the fail code is not 200 / 400
+			}).then(res => {
+				cy.log(res);
+				const user = res.body.data.updateUser;
+				cy.wrap(user)
+					.should('have.property', 'name')
+					.and('eq', 'Bill');
+				cy.wrap(user)
+					.should('have.property', 'email')
+					.and('eq', 'bill@gmail.com');
+				cy.wrap(user)
+					.should('have.property', 'password')
+					.and('not.eq', 'test1234');
+				cy.getCookie('refresh-token').then(cookie => {
+					cy.log(cookie);
+				});
+			});
 		});
 	});
 
