@@ -51,7 +51,7 @@ const mutation = new GraphQLObjectType({
 				// Somehow check this data aligns with the User being updated before actually updating
 				// How do I make sure the tests still run correctly
 				if (context) {
-					console.log('CONTEXT: ', context.decodedToken);
+					console.log('CONTEXT: ', context.token);
 				}
 				if (password) {
 					password = User.generateHash(password);

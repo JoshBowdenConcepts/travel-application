@@ -31,7 +31,7 @@ UserSchema.statics.generateHash = function(password) {
 
 // checking if password is valid
 UserSchema.statics.validPassword = function(password) {
-	return bcrypt.compareSync(password, this.password);
+	return bcrypt.compareSync(password, null);
 };
 
 mongoose.model('user', UserSchema);
