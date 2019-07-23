@@ -48,15 +48,12 @@ app.use((req, res, next) => {
 				if (err) {
 					res.send('Error: ', err);
 				}
-				console.log('DECODED: ', decoded);
 				req.decodedToken = decoded;
 			}
 		);
 	} else {
 		req.decodedToken = false;
 	}
-
-	console.log('UPDATED REQ: ', req.decodedToken);
 	next();
 });
 //=====================================================
@@ -65,11 +62,19 @@ const User = mongoose.model('user');
 app.post('/login', (req, res) => {
 	if (!req.decodedToken) {
 		// CHECK USERS EXISTENCE BECAUSE NO AUTH TOKEN
-		// User.findOne({ email: req.body.email }, (err, user) => {
+		// User.find({ email: req.body.email }, (err, userByEmail) => {
 		// 	if (err) {
 		// 		res.send('Error: ', err);
 		// 	}
 		// 	// Checks password against DB
+		// 	console.log(userByEmail);
+		// 	userByEmail.comparePassword(req.body.pass, (err, isMatch) => {
+		// 		if (isMatch) {
+		// 			res.send('NICE');
+		// 		} else {
+		// 			res.send('BAD PASS');
+		// 		}
+		// 	});
 		// 	const userAuth = user.validPassword(req.body.password);
 		// 	if (userAuth) {
 		// 		res.cookie('user', 'Josh Bowden', {
@@ -78,6 +83,8 @@ app.post('/login', (req, res) => {
 		// 			overwrite: true,
 		// 		});
 		// 		res.send('user logged in and cookie set');
+
+		// 		console.log('success');
 		// 	}
 		// });
 		const refreshToken = jwt.sign(
