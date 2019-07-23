@@ -101,7 +101,7 @@ app.post('/login', (req, res) => {
 			httpOnly: true,
 			overwrite: true,
 		});
-		res.send('got it');
+		res.status(200).send('got it');
 	} else {
 		// Check Auth Data from JWT update Refresh Token
 		const refreshToken = jwt.sign(
@@ -116,7 +116,8 @@ app.post('/login', (req, res) => {
 			httpOnly: true,
 			overwrite: true,
 		});
-		res.send(req.decodedToken);
+		res.status(200).send(req.decodedToken);
+		// res.send(req.decodedToken);
 		// res.send(req.cookies.user + ' is logged in.');
 	}
 });
