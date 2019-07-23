@@ -80,7 +80,7 @@ describe('GraphQL Live Server:', () => {
 			}
 		}`;
 		// Not working with access token
-		cy.setCookie(refreshToken.name, refreshToken.value).then(() => {
+		cy.setCookie(accessToken.name, accessToken.value).then(() => {
 			cy.request({
 				url: 'graphql',
 				method: 'POST',
@@ -98,7 +98,7 @@ describe('GraphQL Live Server:', () => {
 				cy.wrap(user)
 					.should('have.property', 'password')
 					.and('not.eq', 'test1234');
-				cy.getCookie('refresh-token').then(cookie => {
+				cy.getCookie('access-token').then(cookie => {
 					cy.log(cookie);
 				});
 			});

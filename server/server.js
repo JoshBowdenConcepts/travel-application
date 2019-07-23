@@ -48,12 +48,15 @@ app.use((req, res, next) => {
 				if (err) {
 					res.send('Error: ', err);
 				}
+				console.log('DECODED: ', decoded);
 				req.decodedToken = decoded;
-				next();
 			}
 		);
+	} else {
+		req.decodedToken = false;
 	}
-	req.decodedToken = false;
+
+	console.log('UPDATED REQ: ', req.decodedToken);
 	next();
 });
 //=====================================================
@@ -156,7 +159,9 @@ app.use(
 	graphqlHTTP(req => ({
 		schema,
 		graphiql: true,
-		context: req.decodedToken,
+		context: {
+			token: req.decodedToken,
+		},
 	}))
 );
 //=====================================================
